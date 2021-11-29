@@ -1,0 +1,59 @@
+body {
+	background-color: darkslategray;
+	margin: 25px;
+}
+
+img {
+	height: 24px;
+	margin: 8px;
+	margin-left: 32px;
+	vertical-align: middle;
+}
+
+h3 {
+	margin: 0px;
+	margin-top: 32px;
+}
+
+a:visited {
+	color: Highlight;
+}
+
+ul {
+	list-style-type: none;
+	margin-top: 0px;
+	margin-left: -16px;
+}
+
+li img {
+	margin: 8px;
+}
+
+#content-border {
+	height: 100%;
+	background-color: lightslategrey;
+}
+
+#content-area {
+	height: 100%;
+	margin: 25px;
+}
+
+.image-overlay {
+	height: 64px;
+}
+
+	.image-overlay img {
+		position: absolute;
+		margin: 0px;
+	}
+
+	.image-overlay h1 {
+		position: relative;
+		top: 20%;
+	}
+
+#profile-img {
+	width: 64px;
+	height: 64px;
+}
