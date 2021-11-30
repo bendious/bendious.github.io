@@ -1,3 +1,13 @@
+@font-face {
+	font-family: Fredericka;
+	src: url(fonts/fredericka-the-great.regular.ttf);
+}
+
+@font-face {
+	font-family: Metropolis;
+	src: url(fonts/metropolis.regular.otf);
+}
+
 body {
 	margin: 0px;
 }
@@ -7,6 +17,10 @@ img {
 	margin: 8px;
 	margin-left: 32px;
 	vertical-align: middle;
+}
+
+h2, h3, h4, p {
+	font-family: Metropolis, sans-serif;
 }
 
 h3 {
@@ -40,23 +54,28 @@ li img {
 	position: absolute;
 	margin: 25px;
 	padding: 25px;
+	border-radius: 10px;
 	background-color: lightslategrey;
 }
 
-.image-overlay {
-	height: 64px;
+.image-overlay img {
+	position: absolute;
+	margin: 0px;
 }
 
-	.image-overlay img {
-		position: absolute;
-		margin: 0px;
-	}
+.image-overlay h1 {
+	font-family: Fredericka, serif;
+	position: relative;
+	margin-top: 0px;
+	padding-top: 10px;
+	margin-bottom: 0px;
+}
 
-	.image-overlay h1 {
-		position: relative;
-		margin-top: 0px;
-		top: 20%;
-	}
+.image-overlay h4 {
+	position: relative;
+	margin-top: 0px;
+	margin-left: 20px;
+}
 
 #profile-img {
 	width: 64px;
