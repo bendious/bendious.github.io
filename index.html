@@ -7,7 +7,26 @@
 	</head>
 
 	<body>
-		<div id="content-border"><div id="content-area">
+		<!-- Unity canvas, set to cover the background by CSS -->
+		<canvas id="unity-canvas"></canvas>
+		<script src="Build/Build.loader.js"></script>
+		<script>
+		  createUnityInstance(document.querySelector("#unity-canvas"), {
+			dataUrl: "Build/Build.data",
+			frameworkUrl: "Build/Build.framework.js",
+			codeUrl: "Build/Build.wasm",
+			streamingAssetsUrl: "StreamingAssets",
+			companyName: "Hermitage",
+			productName: "bendious.github.io",
+			productVersion: "1.0",
+			// matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+			// devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+		  });
+		  document.getElementById('unity-canvas').style['pointer-events'] = 'none'; // this line disables Unity's mouse event capturing so that we can scroll/click normally regardless of where the pointer is; see https://medium.com/@tuznev/enable-mouse-scroll-functionality-inside-unity3d-container-on-webgl-8dd4dc6a1784
+		</script>
+
+		<!-- Foreground content -->
+		<div id="content-area">
 			<div class="image-overlay">
 				<img id="profile-img" src="images/DavidicMathartic.png" />
 				<h1>bendious</h1>
@@ -23,8 +42,8 @@
 			<a href="https://github.com/bendious"><img src="images/GitHub-Logo.png" /></a>
 			<br /><a href="https://www.linkedin.com/in/blaws"><img src="images/LinkedIn-Blue-14-2x.png" /></a>
 
-			<h3><a href="BenjaminLaws-Resume.pdf">Resume</a></h3>
-			<br/>
-		</div></div>
+			<h3>Resume</h3>
+			<a href="BenjaminLaws-Resume.pdf"><img src="images/open-resume.png" /></a>
+		</div>
 	</body>
 </html>
