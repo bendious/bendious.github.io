@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(AudioSource))]
-public class MusicPlayerUI : MonoBehaviour
+public class MusicPlayerAuto : MonoBehaviour
 {
 	public uint m_samplesPerSecond = 44100U;
 	public bool m_stereo = true;
