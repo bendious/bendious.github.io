@@ -214,7 +214,7 @@ public class ExpressionShader
 				expNew.ParsedExpression.Accept(visitor);
 				foreach (string name in visitor.Parameters)
 				{
-					if (!paramNames.Contains(name))
+					if (paramNames != null && !paramNames.Contains(name))
 					{
 						errorList.Add("Missing param: " + name);
 						return prevValue;
@@ -272,11 +272,14 @@ public class ExpressionShader
 			{
 				// enumerate valid values/parameters
 				List<LogicalExpression> values = new List<LogicalExpression>(new LogicalExpression[] { new ValueExpression(UnityEngine.Random.value * 2.0f) }).Concat(m_builtinParamNames.Select(name => new Identifier(name))).ToList(); // TODO: base scalar value range on parent/sibling expression type?
-				IEnumerable<string> paramsCulled = paramsRaw.Where(nameExp => !string.IsNullOrEmpty(nameExp.Item1)).Select(nameExp => nameExp.Item1); // TODO: check whether expression string is valid? chance to create/remove parameters?
-				values.AddRange(paramsCulled.Select(name => new Identifier(name)));
+				IEnumerable<string> paramsCulled = paramsRaw?.Where(nameExp => !string.IsNullOrEmpty(nameExp.Item1)).Select(nameExp => nameExp.Item1); // TODO: check whether expression string is valid? chance to create/remove parameters?
+				if (paramsCulled != null)
+				{
+					values.AddRange(paramsCulled.Select(name => new Identifier(name)));
+				}
 
 				// enumerate weights and select
-				int paramsCulledCount = paramsCulled.Count();
+				int paramsCulledCount = paramsCulled == null ? 0 : paramsCulled.Count();
 				Assert.AreEqual(values.Count(), m_valueTypeWeights.Length + paramsCulledCount);
 				const float paramWeight = 2.0f;
 				return Utility.RandomWeighted(values.ToArray(), m_valueTypeWeights.Concat(Enumerable.Repeat(paramWeight, paramsCulledCount)).ToArray());
