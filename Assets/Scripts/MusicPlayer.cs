@@ -11,19 +11,19 @@ public class MusicPlayer
 	public bool m_stereo = true;
 	public uint m_maxPolyphony = 40U;
 
-	public uint m_tempo;
-	public bool m_scaleReuse;
-	public uint m_rootNoteIndex;
-	public uint m_scaleIndex;
+	public uint m_tempo = 60U;
+	public bool m_scaleReuse = false;
+	public uint m_rootNoteIndex = MusicUtility.midiMiddleCKey;
+	public uint m_scaleIndex = 0U;
 	public bool[] m_instrumentToggles;
-	public bool m_chordReuse;
+	public bool m_chordReuse = false;
 	public ChordProgression m_chords;
-	public bool m_rhythmReuse;
+	public bool m_rhythmReuse = false;
 	public MusicRhythm m_rhythm;
-	public float[] m_noteLengthWeights;
+	public float[] m_noteLengthWeights = { 0.25f, 0.5f, 1.0f, 1.0f, 0.2f, 0.025f, 0.01f };
 	public uint m_harmonyCount;
 	public uint m_instrumentCount;
-	public float m_volume;
+	public float m_volume = 0.5f;
 
 	public string m_bankFilePath = "GM Bank/gm";
 
@@ -42,6 +42,8 @@ public class MusicPlayer
 		m_musicStreamSynthesizer = new StreamSynthesizer((int)m_samplesPerSecond, channels, bytesPerBuffer / channels, (int)m_maxPolyphony);
 		m_musicStreamSynthesizer.LoadBank(m_bankFilePath);
 	}
+
+	public int InstrumentCount => m_musicStreamSynthesizer == null ? 0 : m_musicStreamSynthesizer.SoundBank.getInstruments(false).Count(instrument => instrument != null); // NOTE that we can't just use SoundBank.InstrumentCount since that includes null instruments...
 
 	public string[] InstrumentNames() => m_musicStreamSynthesizer.SoundBank.getInstruments(false).Where(instrument => instrument != null).Select(instrument => instrument.Name).ToArray();
 
@@ -85,6 +87,8 @@ public class MusicPlayer
 		// create sequencer
 		m_musicSequencer = new MusicSequencer(m_musicStreamSynthesizer, isScale, m_rootNoteIndex, m_scaleIndex, m_instrumentIndices, m_tempo, m_noteLengthWeights, m_harmonyCount, m_chords, m_rhythm);
 	}
+
+	public float LengthSeconds => m_musicSequencer == null ? 0.0f : m_musicSequencer.LengthSamples / (float)m_samplesPerSecond;
 
 	public void Display(string elementIdChords, string elementIdRhythm, string elementIdMain)
 	{
