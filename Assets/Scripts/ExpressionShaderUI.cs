@@ -34,7 +34,7 @@ public class ExpressionShaderUI : MonoBehaviour
 	private void Start()
 	{
 		UpdateLimits();
-		Randomize();
+		InvokeRepeating("Randomize", 0.0f, 5.0f);
 	}
 
 
