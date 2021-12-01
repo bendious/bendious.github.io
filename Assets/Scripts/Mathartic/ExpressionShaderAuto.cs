@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -5,21 +6,40 @@ public class ExpressionShaderAuto : MonoBehaviour
 {
 	private readonly ExpressionShader m_internals = new ExpressionShader();
 
+	private Coroutine m_randomizationCoroutine;
+
 
 	private void Start()
 	{
-		InvokeRepeating("Randomize", 0.0f, 5.0f);
+		Pause(false);
 	}
 
 
-	public void Randomize()
+	public void Pause(bool enable)
+	{
+		if (enable)
+		{
+			StopCoroutine(m_randomizationCoroutine);
+		}
+		else
+		{
+			m_randomizationCoroutine = StartCoroutine(RandomizeRepeating());
+		}
+	}
+
+
+	private IEnumerator RandomizeRepeating()
 	{
 		// get params
 		// TODO: randomize/vary?
 		const uint recursionMax = 5;
 		const bool discontinuous = false;
 
-		// randomize & update shader
-		m_internals.Randomize(recursionMax, discontinuous, null);
+		while (true)
+		{
+			// randomize & update shader
+			m_internals.Randomize(recursionMax, discontinuous, null);
+			yield return new WaitForSeconds(5.0f);
+		}
 	}
 }

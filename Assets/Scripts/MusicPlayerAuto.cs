@@ -20,8 +20,6 @@ public class MusicPlayerAuto : MonoBehaviour
 	{
 		m_player = new MusicPlayer();
 		m_player.Start();
-
-		StartCoroutine(GeneratePlayRepeating());
 	}
 
 	public void Generate(bool isScale)
@@ -53,6 +51,18 @@ public class MusicPlayerAuto : MonoBehaviour
 		m_player.Play(GetComponent<AudioSource>());
 	}
 
+	public void Mute(bool enable)
+	{
+		if (enable)
+		{
+			StopAllCoroutines();
+			GetComponent<AudioSource>().Stop();
+		}
+		else
+		{
+			StartCoroutine(GeneratePlayRepeating());
+		}
+	}
 
 	private IEnumerator GeneratePlayRepeating()
 	{

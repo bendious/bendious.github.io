@@ -36,7 +36,7 @@ public class RuntimeShader : MonoBehaviour
 
 	private bool m_shaderReady = false;
 
-	private float m_startTime = 0.0f;
+	private float m_timeCurrent = 0.0f;
 
 
 	public void UpdateShader(string srcDataVert, string srcDataFrag)
@@ -48,9 +48,11 @@ public class RuntimeShader : MonoBehaviour
 		catch (Exception) { m_shaderReady = false; }
 	}
 
+	public bool Paused { get; set; }
+
 	public void ResetTime()
 	{
-		m_startTime = Time.time;
+		m_timeCurrent = 0.0f;
 	}
 
 
@@ -64,7 +66,11 @@ public class RuntimeShader : MonoBehaviour
 		Graphics.Blit(source, destination);
 		if (m_shaderReady)
 		{
-			SetTime(Time.time - m_startTime);
+			if (!Paused)
+			{
+				m_timeCurrent += Time.deltaTime;
+				SetTime(m_timeCurrent);
+			}
 			GL.IssuePluginEvent(Execute(), 1);
 		}
 	}
