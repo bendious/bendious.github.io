@@ -9,6 +9,7 @@ public class MusicPlayerAuto : MonoBehaviour
 	public uint m_samplesPerSecond = 44100U;
 	public bool m_stereo = true;
 	public uint m_maxPolyphony = 40U;
+	public UnityEngine.UI.Selectable m_muteToggle;
 
 	public string m_bankFilePath = "GM Bank/gm";
 
@@ -57,20 +58,25 @@ public class MusicPlayerAuto : MonoBehaviour
 		{
 			StopAllCoroutines();
 			GetComponent<AudioSource>().Stop();
+			m_muteToggle.interactable = true;
 		}
 		else
 		{
-			StartCoroutine(GeneratePlayRepeating());
+			StartCoroutine(GeneratePlayMultiFrame());
 		}
 	}
 
-	private IEnumerator GeneratePlayRepeating()
+	private IEnumerator GeneratePlayMultiFrame()
 	{
-		while (true)
-		{
-			Generate(false);
-			Play();
-			yield return new WaitForSeconds(m_player.LengthSeconds + Random.Range(1.0f, 4.0f)); // NOTE that the perceived delay will often be higher than the added time due to generation delay
-		}
+		yield return null; // to allow a redisplay w/ the new mute icon before the generation delay
+
+		Generate(false);
+		yield return null;
+
+		Play();
+		m_muteToggle.interactable = true;
+		yield return new WaitForSeconds(m_player.LengthSeconds + Random.Range(1.0f, 4.0f)); // NOTE that the perceived delay will often be higher than the added time due to generation delay
+
+		Mute(false);
 	}
 }

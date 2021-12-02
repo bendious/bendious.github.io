@@ -65,19 +65,19 @@ public class MusicPlayer
 		List<uint> instrumentList = new List<uint>();
 		for (uint i = 0U, n = m_instrumentCount; i < n; ++i)
 		{
-			instrumentList.Add((uint)candidateIndices[UnityEngine.Random.Range(0, candidateIndices.Count)]);
+			instrumentList.Add((uint)candidateIndices[Random.Range(0, candidateIndices.Count)]);
 		}
 		m_instrumentIndices = instrumentList.Distinct().ToArray();
 
 		// regen any random elements
 		if (!m_scaleReuse)
 		{
-			m_rootNoteIndex = (uint)UnityEngine.Random.Range(0, (int)MusicUtility.tonesPerOctave);
-			m_scaleIndex = (uint)UnityEngine.Random.Range(0, MusicUtility.scales.Length);
+			m_rootNoteIndex = (uint)Random.Range(0, (int)MusicUtility.tonesPerOctave);
+			m_scaleIndex = (uint)Random.Range(0, MusicUtility.scales.Length);
 		}
 		if (!m_chordReuse || m_chords.m_progression.Length <= 0)
 		{
-			m_chords = isScale ? new ChordProgression(new float[][] { MusicUtility.chordI, MusicUtility.chordII, MusicUtility.chordIII, MusicUtility.chordIV, MusicUtility.chordV, MusicUtility.chordVI, MusicUtility.chordVII, MusicUtility.chordI.Select(index => index + MusicUtility.tonesPerOctave).ToArray() }) : MusicUtility.chordProgressions[UnityEngine.Random.Range(0, MusicUtility.chordProgressions.Length)];
+			m_chords = isScale ? new ChordProgression(new float[][] { MusicUtility.chordI, MusicUtility.chordII, MusicUtility.chordIII, MusicUtility.chordIV, MusicUtility.chordV, MusicUtility.chordVI, MusicUtility.chordVII, MusicUtility.chordI.Select(index => index + MusicUtility.tonesPerOctave).ToArray() }) : MusicUtility.chordProgressions[Random.Range(0, MusicUtility.chordProgressions.Length)];
 		}
 		if (!m_rhythmReuse || m_rhythm.m_lengthsSixtyFourths.Length <= 0)
 		{
