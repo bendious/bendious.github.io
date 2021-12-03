@@ -103,7 +103,7 @@ public class MusicNote : MusicBlock
 	public override MusicBlock SplitNotes(float[] noteLengthWeights)
 	{
 		Assert.AreEqual(noteLengthWeights.Length, MusicUtility.tonesPerOctave);
-		if (LengthSixtyFourths < MusicUtility.sixtyFourthsPerBeat || UnityEngine.Random.value < 0.5f) // TODO: better conditions?
+		if (LengthSixtyFourths < MusicUtility.sixtyFourthsPerBeat || Utility.RandomValue < 0.5f) // TODO: better conditions?
 		{
 			return this;
 		}
@@ -116,7 +116,7 @@ public class MusicNote : MusicBlock
 		List<MusicNote> splitNotes = Enumerable.Repeat(splitNote, splitCount).ToList();
 		for (int i = 0, n = splitNotes.Count; i < n; ++i)
 		{
-			splitNotes[i] = new MusicNote(splitNotes[i], new float[] { UnityEngine.Random.Range(0, m_chordIndices.Length) }, false, uint.MaxValue);
+			splitNotes[i] = new MusicNote(splitNotes[i], new float[] { Utility.RandomRange(0, m_chordIndices.Length) }, false, uint.MaxValue);
 		}
 		return new MusicBlockSimple(splitNotes.ToArray());
 	}

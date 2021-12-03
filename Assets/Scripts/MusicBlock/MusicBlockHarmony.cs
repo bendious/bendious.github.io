@@ -15,7 +15,7 @@ public class MusicBlockHarmony : MusicBlock
 		bool sameChannel = melody.GetChannels().Contains(harmonyChannel);
 		Assert.IsTrue(harmoniesMax > 0U || !sameChannel);
 		List<MusicNote> harmonyNotes = new List<MusicNote>();
-		List<ValueTuple<MusicNote, uint>> melodyNotes = (UnityEngine.Random.value < 0.333f ? melody.MergeNotes(noteLengthWeights) : (UnityEngine.Random.value < 0.5f ? melody.SplitNotes(noteLengthWeights) : melody)).NotesOrdered(0U); // TODO: more strategic splitting/merging (both w/i same block)?
+		List<ValueTuple<MusicNote, uint>> melodyNotes = (Utility.RandomValue < 0.333f ? melody.MergeNotes(noteLengthWeights) : (Utility.RandomValue < 0.5f ? melody.SplitNotes(noteLengthWeights) : melody)).NotesOrdered(0U); // TODO: more strategic splitting/merging (both w/i same block)?
 		uint endTimePrev = 0U;
 		foreach (ValueTuple<MusicNote, uint> noteTime in melodyNotes)
 		{
@@ -28,7 +28,7 @@ public class MusicBlockHarmony : MusicBlock
 			List<float> offsets = new List<float>();
 			for (uint offsetIdx = 0, offsetCount = harmoniesMax + (sameChannel ? 0U : 1U); offsetIdx < offsetCount; ++offsetIdx)
 			{
-				offsets.Add(UnityEngine.Random.Range(1, chordSize) * (UnityEngine.Random.value < 0.5f ? -1 : 1)); // NOTE that MusicNote() handles preventing duplicates, but we still avoid offsets of 0 to prevent creating empty notes
+				offsets.Add(Utility.RandomRange(1, chordSize) * (Utility.RandomValue < 0.5f ? -1 : 1)); // NOTE that MusicNote() handles preventing duplicates, but we still avoid offsets of 0 to prevent creating empty notes
 			}
 			harmonyNotes.Add(new MusicNote(note, offsets.ToArray(), sameChannel, harmonyChannel));
 			endTimePrev = noteTime.Item2 + noteTime.Item1.SixtyFourthsTotal();

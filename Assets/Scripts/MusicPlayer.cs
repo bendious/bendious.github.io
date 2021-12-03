@@ -65,19 +65,19 @@ public class MusicPlayer
 		List<uint> instrumentList = new List<uint>();
 		for (uint i = 0U, n = m_instrumentCount; i < n; ++i)
 		{
-			instrumentList.Add((uint)candidateIndices[Random.Range(0, candidateIndices.Count)]);
+			instrumentList.Add((uint)candidateIndices[Utility.RandomRange(0, candidateIndices.Count)]);
 		}
 		m_instrumentIndices = instrumentList.Distinct().ToArray();
 
 		// regen any random elements
 		if (!m_scaleReuse)
 		{
-			m_rootNoteIndex = (uint)Random.Range(0, (int)MusicUtility.tonesPerOctave);
-			m_scaleIndex = (uint)Random.Range(0, MusicUtility.scales.Length);
+			m_rootNoteIndex = (uint)Utility.RandomRange(0, (int)MusicUtility.tonesPerOctave);
+			m_scaleIndex = (uint)Utility.RandomRange(0, MusicUtility.scales.Length);
 		}
 		if (!m_chordReuse || m_chords.m_progression.Length <= 0)
 		{
-			m_chords = isScale ? new ChordProgression(new float[][] { MusicUtility.chordI, MusicUtility.chordII, MusicUtility.chordIII, MusicUtility.chordIV, MusicUtility.chordV, MusicUtility.chordVI, MusicUtility.chordVII, MusicUtility.chordI.Select(index => index + MusicUtility.tonesPerOctave).ToArray() }) : MusicUtility.chordProgressions[Random.Range(0, MusicUtility.chordProgressions.Length)];
+			m_chords = isScale ? new ChordProgression(new float[][] { MusicUtility.chordI, MusicUtility.chordII, MusicUtility.chordIII, MusicUtility.chordIV, MusicUtility.chordV, MusicUtility.chordVI, MusicUtility.chordVII, MusicUtility.chordI.Select(index => index + MusicUtility.tonesPerOctave).ToArray() }) : MusicUtility.chordProgressions[Utility.RandomRange(0, MusicUtility.chordProgressions.Length)];
 		}
 		if (!m_rhythmReuse || m_rhythm.m_lengthsSixtyFourths.Length <= 0)
 		{
@@ -101,13 +101,19 @@ public class MusicPlayer
 
 	public void Play(AudioSource source)
 	{
+#if UNITY_WEBGL && !UNITY_EDITOR
+		const bool canStream = false;
+#else
+		const bool canStream = true; // even though this isn't currently supported in the web build, we REALLY want it since it eliminates hitching so easily...
+#endif
+
 		Assert.IsNotNull(source);
 		if (m_musicSequencer == null)
 		{
 			return;
 		}
 		source.volume = m_volume;
-		source.clip = AudioClip.Create("Generated Clip", (int)m_musicSequencer.LengthSamples, m_stereo ? 2 : 1, (int)m_samplesPerSecond, false, OnAudioRead, OnAudioSetPosition); // NOTE that the streaming flag should be set if WebGL ever supports it
+		source.clip = AudioClip.Create("Generated Clip", (int)m_musicSequencer.LengthSamples, m_stereo ? 2 : 1, (int)m_samplesPerSecond, canStream, OnAudioRead, OnAudioSetPosition); // TODO: reduce performance hit here in web build? use web workers and SetData() when possible?
 		source.time = 0.0f;
 		OnAudioSetPosition(0); // needed to ensure WebGL resets audio clip
 		source.Play();

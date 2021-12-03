@@ -53,7 +53,7 @@ public class MusicBlockSimple : MusicBlock
 		for (int i = 0, n = m_blocks.Length; i < n; ++i)
 		{
 			MusicBlock block_cur = m_blocks[i];
-			if (UnityEngine.Random.value < 0.5f/*TODO?*/)
+			if (Utility.RandomValue < 0.5f/*TODO?*/)
 			{
 				manualBlocks.Add(block_cur);
 				continue;

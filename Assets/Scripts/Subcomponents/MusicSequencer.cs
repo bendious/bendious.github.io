@@ -47,7 +47,7 @@ public class MusicSequencer : CSharpSynth.Sequencer.MidiSequencer
 		// determine constituent pieces
 		m_rootKey = (uint)(MusicUtility.midiMiddleAKey + MusicUtility.ScaleOffset(MusicUtility.naturalMinorScale, (int)rootKeyIndex)); // NOTE using A-minor since it contains only the natural notes // TODO: support scales starting on sharps/flats?
 		MusicScale scaleOrig = MusicUtility.scales[scaleIndex];
-		m_scale = new MusicScale(scaleOrig.m_semitones, rootKeyToFifths[scaleIndex,rootKeyIndex], scaleOrig.m_mode);
+		m_scale = new MusicScale(scaleOrig.m_semitones, rootKeyToFifths[scaleIndex, rootKeyIndex], scaleOrig.m_mode);
 		m_chordProgression = isScale ? new ChordProgression(new float[][] { MusicUtility.chordI, MusicUtility.chordII, MusicUtility.chordIII, MusicUtility.chordIV, MusicUtility.chordV, MusicUtility.chordVI, MusicUtility.chordVII, MusicUtility.chordI.Select(index => index + MusicUtility.tonesPerOctave).ToArray() }) : chords;
 		m_rhythm = isScale ? new MusicRhythm(new uint[] { MusicUtility.sixtyFourthsPerBeat / 2U }, new float[] { 0.0f }) : rhythm;
 
@@ -71,14 +71,14 @@ public class MusicSequencer : CSharpSynth.Sequencer.MidiSequencer
 		if (!isScale)
 		{
 			// ensure ending on a long root note // TODO: better outro logic?
-			uint outroLengthMin = MusicUtility.sixtyFourthsPerMeasure / (uint)UnityEngine.Random.Range(1, 3);
+			uint outroLengthMin = MusicUtility.sixtyFourthsPerMeasure / (uint)Utility.RandomRange(1, 3);
 			if (notes.Last().ContainsRoot()) // TODO: include harmonies in check but also add harmonies if adding an additional note?
 			{
 				notes.Last().LengthSixtyFourths = Math.Max(outroLengthMin, notes.Last().LengthSixtyFourths);
 			}
 			else
 			{
-				notes.Add(new MusicNote(new float[] { 0.0f }, outroLengthMin, UnityEngine.Random.Range(0.5f, 1.0f), MusicUtility.chordI7, 0U)); // TODO: coherent volume?
+				notes.Add(new MusicNote(new float[] { 0.0f }, outroLengthMin, Utility.RandomRange(0.5f, 1.0f), MusicUtility.chordI7, 0U)); // TODO: coherent volume?
 			}
 		}
 
