@@ -36,7 +36,10 @@ public class MusicPlayerAuto : MonoBehaviour
 		if (enable)
 		{
 			StopAllCoroutines();
-			GetComponent<AudioSource>().Stop();
+			foreach (AudioSource source in GetComponents<AudioSource>())
+			{
+				source.Stop();
+			}
 			m_muteToggle.interactable = true;
 		}
 		else
@@ -63,7 +66,6 @@ public class MusicPlayerAuto : MonoBehaviour
 		m_player.m_rhythmReuse = false;
 		m_player.m_harmonyCount = (uint)Utility.RandomRange(0, 3);
 		m_player.m_instrumentCount = (uint)Utility.RandomRange(1, 3);
-		m_player.m_volume = 0.01f;
 		m_player.m_bankFilePath = m_bankFilePath;
 
 		// generate
@@ -74,18 +76,18 @@ public class MusicPlayerAuto : MonoBehaviour
 	private IEnumerator PlayAfterGeneration()
 	{
 		m_generateDone = false;
-#if UNITY_WEBGL && !UNITY_EDITOR
-			Thread thread = new Thread(new ThreadStart(Generate));
-			thread.IsBackground = true;
-			thread.Priority = System.Threading.ThreadPriority.Lowest;
-			thread.Start();
+#if !UNITY_WEBGL || UNITY_EDITOR
+		Thread thread = new Thread(new ThreadStart(Generate));
+		thread.IsBackground = true;
+		thread.Priority = System.Threading.ThreadPriority.Lowest;
+		thread.Start();
 #else
 		Generate();
 #endif
 
 		yield return new WaitUntil(() => m_generateDone);
 		m_muteToggle.interactable = true;
-		m_player.Play(GetComponent<AudioSource>());
+		StartCoroutine(m_player.Play(GetComponents<AudioSource>()));
 
 		yield return new WaitForSeconds(m_player.LengthSeconds + Utility.RandomRange(1.0f, 4.0f)); // NOTE that the perceived delay will often be higher than the added time due to subsequent generation delay
 		Mute(false);

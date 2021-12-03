@@ -1,4 +1,5 @@
 using CSharpSynth.Synthesis;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,7 +24,6 @@ public class MusicPlayer
 	public float[] m_noteLengthWeights = { 0.25f, 0.5f, 1.0f, 1.0f, 0.2f, 0.025f, 0.01f };
 	public uint m_harmonyCount;
 	public uint m_instrumentCount;
-	public float m_volume = 0.5f;
 
 	public string m_bankFilePath = "GM Bank/gm";
 
@@ -99,24 +99,50 @@ public class MusicPlayer
 		}
 	}
 
-	public void Play(AudioSource source)
+	public IEnumerator Play(AudioSource[] sources)
 	{
-#if UNITY_WEBGL && !UNITY_EDITOR
-		const bool canStream = false;
-#else
-		const bool canStream = true; // even though this isn't currently supported in the web build, we REALLY want it since it eliminates hitching so easily...
-#endif
+		// set up manual streaming since Unity can't automate it on web builds
+		// see https://johnleonardfrench.com/ultimate-guide-to-playscheduled-in-unity/
+		// NOTE that if ever support is added, most all of this should be replaced w/ AudioClip.Create()'s stream flag
+		const double perClipSecondsMax = 2.5;
+		const double perClipSecondsMaxHalf = perClipSecondsMax * 0.5;
 
-		Assert.IsNotNull(source);
 		if (m_musicSequencer == null)
 		{
-			return;
+			yield break;
 		}
-		source.volume = m_volume;
-		source.clip = AudioClip.Create("Generated Clip", (int)m_musicSequencer.LengthSamples, m_stereo ? 2 : 1, (int)m_samplesPerSecond, canStream, OnAudioRead, OnAudioSetPosition); // TODO: reduce performance hit here in web build? use web workers and SetData() when possible?
-		source.time = 0.0f;
-		OnAudioSetPosition(0); // needed to ensure WebGL resets audio clip
-		source.Play();
+		Assert.IsFalse(sources.Any(source => source == null));
+
+		// inter-loop data
+		int perClipSamplesMax = (int)(perClipSecondsMax * m_samplesPerSecond);
+		int samplesTotal = (int)m_musicSequencer.LengthSamples;
+
+		// iterators
+		int sampleItr = 0;
+		int sourceIdxItr = 0;
+		int clipCount = 0;
+		AudioClip.PCMSetPositionCallback positionCallback = OnAudioSetPosition;
+		double timeItr = AudioSettings.dspTime + 0.25; // NOTE that we schedule the first clip a little in advance to keep our subsequent times from being off due to the scheduler not having enough lead time
+
+		// loop through audio in chunks
+		while (sampleItr < samplesTotal)
+		{
+			// create clip on next source
+			AudioSource source = sources[sourceIdxItr];
+			int samplesCur = System.Math.Min(perClipSamplesMax, samplesTotal - sampleItr);
+			source.clip = AudioClip.Create("Generated Clip " + clipCount, samplesCur, m_stereo ? 2 : 1, (int)m_samplesPerSecond, false, OnAudioRead, positionCallback);
+
+			// schedule and wait until halfway done
+			source.PlayScheduled(timeItr);
+			yield return new WaitForSeconds((float)(timeItr + perClipSecondsMaxHalf - AudioSettings.dspTime));
+
+			// increment
+			sampleItr += samplesCur;
+			sourceIdxItr = (sourceIdxItr + 1) % sources.Length;
+			++clipCount;
+			positionCallback = IgnoreAudioSetPosition;
+			timeItr += (double)samplesCur / m_samplesPerSecond;
+		}
 	}
 
 	public string Export(string filepath)
@@ -133,5 +159,7 @@ public class MusicPlayer
 		// NOTE that we don't increment m_musicSequencer since m_musicStreamSynthesizer takes care of that
 	}
 
-	private void OnAudioSetPosition(int new_position) => m_musicSequencer.SetTime(System.TimeSpan.FromSeconds(new_position / (double)m_samplesPerSecond));
+	private void OnAudioSetPosition(int newPosition) => m_musicSequencer.SetTime(System.TimeSpan.FromSeconds(newPosition / (double)m_samplesPerSecond));
+
+	private void IgnoreAudioSetPosition(int newPosition) { } // necessary to avoid the sequencer getting reset every time the next chunk is manually "streamed"
 }

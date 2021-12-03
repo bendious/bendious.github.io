@@ -35,7 +35,7 @@ public static class Utility
 		return Enum.GetValues(typeof(T)).Length;
 	}
 
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if !UNITY_WEBGL || UNITY_EDITOR
 	public static bool IsMainThread { get => !Thread.CurrentThread.IsBackground; } // TODO: more exact identification w/o performance hit?
 #else
 	public const bool IsMainThread = true;
