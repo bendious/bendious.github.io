@@ -104,8 +104,8 @@ public class MusicPlayer
 		// set up manual streaming since Unity can't automate it on web builds
 		// see https://johnleonardfrench.com/ultimate-guide-to-playscheduled-in-unity/
 		// NOTE that if ever support is added, most all of this should be replaced w/ AudioClip.Create()'s stream flag
-		const double perClipSecondsMax = 2.5;
-		const double perClipSecondsMaxHalf = perClipSecondsMax * 0.5;
+		const double perClipSecondsMax = 1.0;
+		const double gapSeconds = 0.25;
 
 		if (m_musicSequencer == null)
 		{
@@ -122,7 +122,7 @@ public class MusicPlayer
 		int sourceIdxItr = 0;
 		int clipCount = 0;
 		AudioClip.PCMSetPositionCallback positionCallback = OnAudioSetPosition;
-		double timeItr = AudioSettings.dspTime + 0.25; // NOTE that we schedule the first clip a little in advance to keep our subsequent times from being off due to the scheduler not having enough lead time
+		double timeItr = AudioSettings.dspTime + gapSeconds; // NOTE that we schedule the first clip a little in advance to keep our subsequent times from being off due to the scheduler not having enough lead time
 
 		// loop through audio in chunks
 		while (sampleItr < samplesTotal)
@@ -132,9 +132,9 @@ public class MusicPlayer
 			int samplesCur = System.Math.Min(perClipSamplesMax, samplesTotal - sampleItr);
 			source.clip = AudioClip.Create("Generated Clip " + clipCount, samplesCur, m_stereo ? 2 : 1, (int)m_samplesPerSecond, false, OnAudioRead, positionCallback);
 
-			// schedule and wait until halfway done
+			// schedule and wait until partway done
 			source.PlayScheduled(timeItr);
-			yield return new WaitForSeconds((float)(timeItr + perClipSecondsMaxHalf - AudioSettings.dspTime));
+			yield return new WaitForSeconds((float)(timeItr + gapSeconds - AudioSettings.dspTime)); // we wait until the clip has just started, to give ourselves plenty of lead time w/o putting too much work into a single frame
 
 			// increment
 			sampleItr += samplesCur;
